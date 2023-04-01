@@ -1,3 +1,4 @@
+
 #  GNU nano 5.4                                                                    
 
 #This python code shows Temperature, Humedity and preasure from the Bme680 Sensor in the OLED sh1107 screen. 
@@ -53,6 +54,8 @@ def pres():
 #    return " %.f Ohms" % (sensor.data.gas_resistance) #GAS
 
 # Main program
+text_position = 0
+direction = 1
 while True:
     sensor.get_sensor_data()
     
@@ -60,17 +63,22 @@ while True:
         draw.rectangle(device.bounding_box, outline="white", fill="black")
         draw.text((0, 0), "MINISENSOR", fill="white", font=FontTemp)
 
-        draw.text((4, 18), "TEMP:  ", fill="white", font=FontTemp2)
-        draw.text((5, 37), temp(), fill="white", font=FontTemp2)
-        
-        draw.text((5, 54), "HUM: ", fill="white", font=FontTemp2)
-        draw.text((5, 69), humi(), fill="white", font=FontTemp2)
+        draw.text((4, 18 + text_position), "TEMP:  ", fill="white", font=FontTemp2)
+        draw.text((5, 37 + text_position), temp(), fill="white", font=FontTemp2)
 
-        draw.text((5, 86), "PRES:  ", fill="white", font=FontTemp2)
-        draw.text((5,105), pres(), fill="white", font=FontTemp2)
+        draw.text((5, 54 + text_position), "HUM: ", fill="white", font=FontTemp2)
+        draw.text((5, 69 + text_position), humi(), fill="white", font=FontTemp2)
 
-#        draw.text((5, 87), "GAS:  ", fill="white", font=FontTemp2) #GAS
-#        draw.text((10, 100), gas(), fill="white", font=FontTemp2) #GAS
-        
+        draw.text((5, 86 + text_position), "PRES:  ", fill="white", font=FontTemp2)
+        draw.text((5, 105 + text_position), pres(), fill="white", font=FontTemp2)
+
+#       draw.text((5, 87), "GAS:  ", fill="white", font=FontTemp2) #GAS
+#       draw.text((10, 100), gas(), fill="white", font=FontTemp2) #GAS
+
+        # Update text_position
+        text_position += direction
+        if text_position > 10 or text_position < 0:
+            direction = -direction
+
     time.sleep(1)
 
