@@ -1,17 +1,15 @@
-
-#  GNU nano 5.4                                                                    
-
-#This python code shows Temperature, Humedity and preasure from the Bme680 Sensor in the OLED sh1107 screen. 
-
 import bme680
 import time
 from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import sh1106
 from PIL import ImageFont
+import subprocess  # bring the codes for the RGB matrix
+
 # Load a larger font
 FontTemp = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
 FontTemp2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+
 try:
     sensor = bme680.BME680(bme680.I2C_ADDR_PRIMARY)
 except (RuntimeError, IOError):
@@ -25,40 +23,38 @@ sensor.set_pressure_oversample(bme680.OS_4X)
 sensor.set_temperature_oversample(bme680.OS_8X)
 sensor.set_filter(bme680.FILTER_SIZE_3)
 
-#Uncomment #GAS lines if you want to see Gas_Resistance, but the Gas sensor will warm the termometer making Temp readings more elevated.
-
-#sensor.set_gas_status(bme680.ENABLE_GAS_MEAS) #GAS
-
-#sensor.set_gas_heater_temperature(320) #GAS
-#sensor.set_gas_heater_duration(150) #GAS
-#sensor.select_gas_heater_profile(0) #GAS
-
 device = sh1106(i2c(port=1, address=0x3C), width=128, height=128, rotate=2)
 
 sensor.data.temperature = 0
 sensor.data.pressure = 0
 sensor.data.humidity = 0
-#sensor.data.gas_resistance = 0 #GAS
 
-# Subprograms
 def temp():
-    return "   %.1f C" % (sensor.data.temperature -6.1)
+    return "   %.1f C" % (sensor.data.temperature - 6.1)
 
 def humi():
-    return "  %.1f %%" % (sensor.data.humidity + 13.5 ) #I have compared readings from BM680 sensor with and indoor sensor and decided to modify final ridings for temperature and humedity. Maybe my sensor was not propperly working
+    return "  %.1f %%" % (sensor.data.humidity + 13.5)
 
 def pres():
     return "  %.f hPa" % (sensor.data.pressure)
 
-#def gas(): #GAS
-#    return " %.f Ohms" % (sensor.data.gas_resistance) #GAS
-
-# Main program
+current_range = None
 text_position = 0
 direction = 1
+
 while True:
     sensor.get_sensor_data()
+
+    temperature = sensor.data.temperature - 6.1
+    if temperature < 17:
+        subprocess.Popen(["python", "cold.py"])
+    elif 17 <= temperature <= 19:
+        subprocess.Popen(["python", "medium.py"])
+    else:
+        subprocess.Popen(["python", "warm.py"])
     
+    # rest of your code
+
     with canvas(device) as draw:
         draw.rectangle(device.bounding_box, outline="white", fill="black")
         draw.text((0, 0), "MINISENSOR", fill="white", font=FontTemp)
@@ -81,4 +77,3 @@ while True:
             direction = -direction
 
     time.sleep(1)
-
