@@ -1,4 +1,9 @@
 # Weather AT home
+
+
+![Pisenbsor](https://user-images.githubusercontent.com/41577767/231883628-893fcd65-f284-4a3b-8949-6331c69430d4.gif)
+
+
 This is a project that uses a Raspberry Pi and a BME680 sensor to measure various indoor weather parameters like temperature, humidity, air pressure, and gas resistance. The measured data is displayed on an OLED screen for easy reading and alerts are provided using a LED matrix. The project is ongoing and serves the purpose of learning, and it is not intended to be used as a real indoor weather monitoring system.
 
 **Hardware**
