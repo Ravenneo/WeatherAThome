@@ -1,5 +1,22 @@
+#  Automartise ON/OFF                                                                   
 
-#  GNU nano 5.4                                                                    
+import os
+import signal
+
+# Add this function to handle the script termination
+def signal_handler(signum, frame):
+    # Clean up the PID file when the script is terminated
+    if os.path.exists("weather_OLED.pid"):
+        os.remove("weather_OLED.pid")
+    exit(0)
+
+# Register the signal handler for SIGTERM and SIGINT
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+
+# Create the PID file
+with open("weather_OLED.pid", "w") as pid_file:
+    pid_file.write(str(os.getpid()))
 
 #This python code shows Temperature, Humedity and preasure from the Bme680 Sensor in the OLED sh1107 screen. 
 
@@ -81,4 +98,6 @@ while True:
             direction = -direction
 
     time.sleep(1)
-
+# Remove the PID file when the script exits gracefully
+if os.path.exists("weather_OLED.pid"):
+    os.remove("weather_OLED.pid")
